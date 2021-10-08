@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<script src="/js/jquery-3.6.0.min.js"></script>
+<style>
+   .hidden {
+      display: none;
+   }
+</style>
+<script>
+   function switchPage(page) {
+      $(".page_").addClass("hidden");
+      $("#" + page).removeClass("hidden");
+      
+      if(page != "category") {
+         const button = $("<button>");
+         button.text("처음으로");
+         button.click(function() {
+            switchPage("category");
+         });
+         
+         $("#" + page).append(button)
+      }
+   }
+
+   $(function() {
+      switchPage("category");
+      
+      $("#category").on("click", "button", function() {
+         const categoryId = $(this).data("categoryId")
+         // alert();
+         
+         $.getJSON("/api/category/" + categoryId, function(data) {
+            console.log(data);
+            
+            $("#store").empty();
+            
+            if(data.length > 0) {
+               data.forEach(element => {
+                  const div = $("<div>");
+                  
+                  const StoreName = $("<p>");
+                  StoreName.text(element.StoreName);
+                  
+                  const tel = $("<p>");
+                  tel.text(element.tel);
+                  
+                  div.append(StoreName);
+                  div.append(tel);
+                  
+                  $("#store").append(div);
+               });
+            } else {
+               const div = $("<div>");
+               div.text("등록 된 상점이 없습니다");
+               
+               $("#store").append(div);
+            }
+            
+            switchPage("store");
+         });
+      });
+
+        $.getJSON("/api/category", function(data) {
+            data.forEach(element => {
+                const div = $("<div>");
+                div.addClass("category");
+
+                const img = $("<img>");
+                img.attr("src", "/upload/files/" + element.image);
+
+                const button = $("<button>");
+                button.text(element.categoryName);
+                button.data("categoryId", element.categoryId);
+
+                div.append(img);
+                div.append(button);
+
+                $("#category").append(div);
+            });
+        });
+    });
+</script>
+</head>
+<body>
+   <div class="container">
+      <div id="category" class="page_"></div>
+      <div id="store" class="page_"></div>
+   </div>
+</body>
+</html>

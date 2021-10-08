@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="store">
+
+	<select id="listByCategory" resultType="Store">
+		SELECT * FROM store
+		WHERE category_id=#{categoryId}
+	</select>
+
+   <sql id="search">
+      SELECT store.*, category.category_name, member.name member_name FROM store
+	  JOIN category ON store.category_id = category.category_id
+	  JOIN member ON store.member_id=member.id
+   </sql>
+   
+   <select id="total" resultType="Integer">
+      SELECT COUNT(*) FROM
+      (<include refid="search"></include>)
+   </select>
+   
+   <select id="list" resultType="Store">
+      SELECT * FROM
+         (SELECT ROWNUM rnum, sub.* FROM
+            (<include refid="search"></include>) sub)
+      <![CDATA[
+      WHERE rnum >= ((#{page} - 1) * #{perPage} + 1) AND rnum <= (#{page} * #{perPage})
+      ]]>
+      ORDER BY store_id
+   </select>
+   
+   <insert id="add">
+      INSERT INTO store
+      VALUES (STORE_SEQ.nextval, #{storeName}, #{tel}, #{address}, #{categoryId}, #{memberId})
+   </insert>
+   
+   <select id="item" resultType="Store">
+      SELECT * FROM store
+      WHERE store_id=#{storeId}
+   </select>
+   
+   <update id="update">
+      UPDATE store
+      SET store_name=#{storeName}, tel=#{tel}, address=#{address}, category_id=#{categoryId}, member_id=#{memberId}
+      WHERE store_id=#{storeId}
+   </update>
+   
+   <delete id="delete">
+      DELETE FROM store
+      WHERE store_id=#{storeId}
+   </delete>
+</mapper>

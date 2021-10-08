@@ -1,0 +1,19 @@
+* PAGER.JS 적용 시 확인사항
+
+1. pager.js에 필요한 변수 설정
+	const url = "/api/book";
+	const key = "bookid";
+
+2. pager.js 추가
+
+3. header설정
+	class="order"
+	data-order=
+	data-name=
+
+4. 매퍼에서 order by 설정
+
+5. 검색기능설정
+	id="search_button"
+	id="search"
+	id="keyword"

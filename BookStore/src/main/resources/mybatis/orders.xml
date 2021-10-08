@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="orders">
+
+   <select id="list" resultType="Orders">
+      SELECT orders.*, customer.name,
+      book.bookname FROM orders
+      JOIN customer ON orders.custid = customer.custid
+      JOIN book ON orders.bookid = book.bookid
+      ORDER BY orderid
+   </select>
+
+   <insert id="add">
+      INSERT INTO orders
+      VALUES (ORDERS_SEQ.nextval, #{custid},
+      #{bookid})
+   </insert>
+
+   <delete id="delete">
+      DELETE FROM orders
+      WHERE orderid=#{orderid}
+   </delete>
+
+   <select id="item" resultType="Orders">
+      SELECT * FROM orders
+      WHERE
+      orderid=#{orderid}
+   </select>
+
+   <update id="update">
+      UPDATE orders
+      SET custid=#{custid}, bookid=#{bookid}
+      WHERE orderid=#{orderid}
+   </update>
+
+</mapper>

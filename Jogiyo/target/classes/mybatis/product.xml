@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="product">
+	<sql id="search">
+		SELECT * FROM product
+	</sql>
+
+	<select id="total" resultType="Integer">
+		SELECT COUNT(*) FROM
+		(
+		<include refid="search"></include>
+		)
+	</select>
+
+	<select id="list" resultType="Product">
+		SELECT * FROM
+		(SELECT ROWNUM rnum, sub.* FROM
+		(
+		<include refid="search"></include>)
+		sub)
+      <![CDATA[
+      WHERE rnum >= ((#{page} - 1) * #{perPage} + 1) AND rnum <= (#{page} * #{perPage})
+      ]]>
+		ORDER BY product_id DESC
+	</select>
+	
+	<resultMap type="Product" id="ProductMap">
+		<id column="product_id" property="productId" />
+		<result column="product_name" property="productName" />
+		<result column="price" property="price"/>
+		<result column="product_info" property="productInfo"/>
+		<result column="store_id" property="storeId" />
+		
+		<collection property="productImages" column="pid" ofType="ProductImage" javaType="ArrayList" >
+			<id column="product_image_id" property="productImageId" />
+			<result column="filename" property="filename" />
+			<result column="pid" property="productId" />
+		</collection>
+	</resultMap>
+
+	<select id="item" resultMap="ProductMap">
+		SELECT product.*,
+		product_image.product_image_id,
+		product_image.filename,
+		product_image.product_id pid FROM product
+		LEFT JOIN product_image
+		ON product.product_id=product_image.product_id
+		WHERE product.product_id=#{productId}
+	</select>
+
+	<insert id="add">
+		INSERT INTO product
+		VALUES (PRODUCT_SEQ.nextval, #{productName}, #{price}, #{productInfo},
+		#{storeId})
+
+		<selectKey keyProperty="productId" order="AFTER"
+			resultType="Integer">
+			SELECT PRODUCT_SEQ.currval FROM DUAL
+		</selectKey>
+	</insert>
+
+	<update id="update">
+		UPDATE product
+		SET product_name=#{productName}, price=#{price},
+		product_info=#{productInfo}
+		WHERE product_id=#{productId}
+	</update>
+
+	<delete id="delete">
+		DELETE FROM product
+		WHERE product_id=#{productId}
+	</delete>
+</mapper>
